@@ -7,7 +7,7 @@ This is an Amazon-like storefront using MySQL and Node.js. The app will take in 
 
 #### Files:
 
-BamazonCustomer.js
+bamazonCustomer.js
  - Prints the products in the store.
  - Prompts customer which product they would like to purchase by ID number.
  - Asks for the quantity.
@@ -16,7 +16,7 @@ BamazonCustomer.js
      * If the purchase goes through, it updates the stock quantity to reflect the purchase.
      * It will also update the product sales in the department table.
 
-BamazonManager.js
+bamazonManager.js
  - Starts with a menu:
      * View Products for Sale
      * View Low Inventory
@@ -29,7 +29,7 @@ BamazonManager.js
  - If the manager selects Add New Product, it allows the manager to add a new product to the store.
  - If the manager selects End Session, it ends the session and doesn't go back to the menu.     
 
-BamazonExecutive.js
+bamazonSupervisor.js
 
 Starts with a menu:
 
