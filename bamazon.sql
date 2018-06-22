@@ -9,20 +9,20 @@ CREATE TABLE products (
   department VARCHAR(50) NOT NULL,
   price DECIMAL (10,2) NOT NULL,
   quantity INT NOT NULL,
+  product_sales DECIMAL (10,2) DEFAULT 0,
   PRIMARY KEY (id)
 );
 
-INSERT INTO products (product, department, price, quantity)
-VALUES ("Baby Formula", "Baby", 15.00, 300),
-       ("Pacifier", "Baby", 5.00, 300),
-       ("Baby Wipes", "Baby", 2.00, 300),
-       ("Cat Food", "Pet", 20.00, 100),
-       ("Dog Food", "Pet", 25.00, 100),
-       ("Milk", "Food", 5.00, 400),
-       ("Cheese", "Food", 5.00, 400),
-       ("Yogurt", "Food", 5.00, 400),
-       ("Table", "Furniture", 100.00, 20),
-       ("Chair", "Furniture", 50.00, 20);
+INSERT INTO products (product, department, price, quantity, product_sales)
+VALUES ("Baby Formula", "Baby", 15.00, 300,0),
+       ("Pacifier", "Baby", 5.00, 300,0),
+       ("Baby Wipes", "Baby", 2.00, 300,0),
+       ("Cat Food", "Pet", 20.00, 100,0),
+       ("Dog Food", "Pet", 25.00, 100,0),
+       ("Milk", "Food", 5.00, 400,0),
+       ("Cheese", "Food", 5.00, 400,0),
+       ("Bed", "Furniture", 150.00, 400,0),
+       ("Table", "Furniture", 100.00, 200,0);
 
 SELECT * FROM products;
 
