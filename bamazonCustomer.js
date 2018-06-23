@@ -161,20 +161,7 @@ function askUserToBuyMore(userIdPar, userQuantityPar, data){
           };
       });
 }
-// function processOrder(userIdPar, userQuantityPar, productPrice, data) {
 
-//     console.log('total price for purchase');
-
-//     var totalPrice = userQuantityPar * data[0].price;
-
-//     console.log("\nPlease review your order:  Total Price ($) " + totalPrice + ".");
-
-//     updateDataProducts(userIdPar, userQuantityPar, data);
-
-    //add function to update product sales column
-    // calculate total here
-
-//}
 
 function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, data) {
 

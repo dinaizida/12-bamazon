@@ -33,7 +33,7 @@ function start() {
             case "Create New Department":
                 createNewDept();
                 break;
-            case "End Session":
+            case "Exit":
                 exit();
         }
     });
