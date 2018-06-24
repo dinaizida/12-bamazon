@@ -5,7 +5,7 @@ var idSelected = 0;
 var quantitySelected = 0;
 var totalProductPrice = 0;
 var totalPrice = 0;
-
+var moreShopping = true;
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -41,6 +41,8 @@ function askUserToStart() {
     });
 }
 
+
+
 // function that makes a sql query to display all products to the user
 // in real life environemt we normall do not display the whole database, this is just for this app as an example
 function viewProducts() {
@@ -52,9 +54,9 @@ function viewProducts() {
         console.log('Current Products Inventory\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
-            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity, res[i].product_sales]);
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
         }
-        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity", "PRODUCT SALES"];
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
         console.table(tableHeader, values);
         askUser()
     });
@@ -146,15 +148,16 @@ function askUserToBuyMore(userIdPar, userQuantityPar, data){
               totalPrice = totalPrice + totalProductPrice;
                
               updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, data); // update Database
-              askUser();
+              
+            //   askUser();
           } else {// if user does not want to buy more products
 
               totalProductPrice = userQuantityPar * data[0].price;
-              console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " : " + totalProductPrice);
+              console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " is " + totalProductPrice);
               totalPrice = totalPrice + totalProductPrice;
 
               console.log("\nPlease review your order:  Total Order Price($): " + totalPrice + ".");
-
+              moreShopping = false;
               updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, data);// update database, 
 
 
@@ -163,9 +166,27 @@ function askUserToBuyMore(userIdPar, userQuantityPar, data){
 }
 
 
+
 function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, data) {
 
+    // create a new columnt to dislay product_sale data 
     console.log('// update database information');
+
+    // ALTER TABLE departments ADD product_sales DECIMAL (10,2) DEFAULT 0;
+
+    // ALTER table login add column (code varchar(255));
+
+//     connection.query('ALTER TABLE products ADD productANDsales (code DECIMAL (10,2) DEFAULT 0)',function(err,result){
+//         if (err) throw err;
+
+//             console.log("new column added");
+        
+//     });
+
+//   console.log('new column added');
+    
+
+   
     console.log("userIdChoice + userQuantityChoice + data---   " + userIdChoice + userQuantityChoice + data);
 
     // update database information
@@ -184,8 +205,16 @@ function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, 
           function(err, res) {
             console.log(res.affectedRows + " products updated!\n");
 
+
+
+            if(moreShopping === true){
+               askUser();
+            }
+            else{ 
             exit();
-            //askUser();
+
+            }
+           
 
 
 
