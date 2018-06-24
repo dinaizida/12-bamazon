@@ -1,8 +1,6 @@
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 var table = require("console.table"); //to display inventory in a table format
-var idSelected = 0;
-var quantitySelected = 0;
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -15,11 +13,9 @@ var connection = mysql.createConnection({
 // connects to the mysql server and sql database
 connection.connect(function(err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId);
-    viewProducts();
-    
-});
+    start();
 
+});
 
 function start() {
     inquirer.prompt([{
@@ -37,58 +33,117 @@ function start() {
                 break;
             case "Add to Inventory":
                 AddToInventory();
-            break;    
+                break;
             case "Add New Product":
-               AddNewProduct();
-            break;
+                AddNewProduct();
+                break;
             case "Exit":
                 exit();
         }
     });
-}
+};
 
-// function that makes a sql query to display all products to the user
-function viewProducts() {
-    console.log('**************************\n');
-    console.log("BAMAZON Store\n");
-    console.log('**************************\n');
+function viewProductForSale() {
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
+        console.log('**************************\n');
+        console.log("BAMAZON Store Managers Portal\n");
+        console.log('**************************\n');
         console.log('Current Products Inventory\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
-            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity, res[i].product_sales]);
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
         }
-        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity", "PRODUCT SALES"];
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
         console.table(tableHeader, values);
+        console.log('**************************\n');
         start();
     });
-
-};
-
-function viewProductForSale() {
-    viewProducts();
-    console.log('viewProductForSale()');
 };
 
 function ViewLowInventory() {
-    console.log('The following products have low inventory: ');
+    console.log('**************************\n');
+    console.log('The following products have low inventory: \n');
+    connection.query("SELECT * FROM products WHERE quantity < 10", function(err, res) {
+        if (err) throw err;
+        var values = [];
+        for (var i = 0; i < res.length; i++) {
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
+        }
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
+        console.table(tableHeader, values);
+        console.log('**************************\n');
+        start();
+    });
+};
 
-    start()
-};
 function AddToInventory() {
-    console.log('New Product ' + product name +  "added to product inventory.");
-    start()
-};
-function viewProductForSale() {
-    console.log('viewProductForSale()');
-    start()
-};
+    inquirer.prompt([{
+        type: "input",
+        name: "id",
+        message: "Please enter the ID number of the product you would like to update."
+    }, {
+        type: "input",
+        name: "quantity",
+        message: "How many items you want to add to the current supply?"
+    }]).then(function(answers) {
+
+        idSelected = answers.id; //manager choice
+        quantitySelected = answers.quantity; // manager choice
+        connection.query("UPDATE products SET quantity = quantity + ? WHERE id = ?", [quantitySelected, idSelected],
+            function(err, res) {
+                if (err) throw err;
+                //select a product name that was updated to print it out
+                connection.query("SELECT * FROM products WHERE id = ?", [idSelected],
+                    function(err, res) {
+                        if (err) throw err;
+                        console.log('**************************\n');
+                        console.log('Inventory has been updated for ' + res[0].product + '!\n');
+                        console.log('**************************\n');
+                        start();
+                    });
+            });
+
+    });
+}
+
 function AddNewProduct() {
-    console.log('AddNewProduct()');
-    start()
+    inquirer.prompt([{
+        name: "name",
+        type: "input",
+        message: "Please enter the product name:"
+    }, {
+        name: "dept",
+        type: "input",
+        message: "Please enter the department name:"
+    }, {
+        name: "price",
+        type: "input",
+        message: "Please enter the product's price:"
+    }, {
+        name: "quantity",
+        type: "input",
+        message: "Please enter the quantity of the product:"
+    }]).then(function(answer) {
+        connection.query("INSERT INTO products SET ?", {
+                product: answer.name,
+                department: answer.dept,
+                price: answer.price,
+                quantity: answer.quantity
+            },
+            function(err, res) {
+                if (err) throw err;
+
+                console.log('**************************\n');
+                console.log(answer.name + ' was successfully added to the inventory!\n');
+                console.log('**************************\n');
+                start();
+            });
+    });
 };
+
 function exit() {
-    console.log('Thank you for visiting BAMAZON store!');
+    console.log('Thank you for Managing BAMAZON store!\n');
+    console.log('**************************\n');
     connection.end();
 };

@@ -21,25 +21,26 @@ VALUES ("Baby Formula", "Baby", 15.00, 300),
        ("Dog Food", "Pet", 25.00, 100),
        ("Milk", "Food", 5.00, 400),
        ("Cheese", "Food", 5.00, 400),
-       ("Bed", "Furniture", 150.00, 400),
-       ("Table", "Furniture", 100.00, 200);
+       ("Chicken", "Food", 5.00, 5),
+       ("Bed", "Furniture", 150.00, 10),
+       ("Table", "Furniture", 100.00, 5);
 
 SELECT * FROM products;
 
 CREATE TABLE departments(
 	department_id INTEGER AUTO_INCREMENT NOT NULL,
 	department_name VARCHAR(50) NOT NULL,
-	over_head_costs DECIMAL (10,2) NOT NULL,L,
+	over_head_costs DECIMAL (10,2) NOT NULL,
 	--product_sales DECIMAL (10,2) DEFAULT 0,
 	total_profit DECIMAL (10,2) DEFAULT 0,
 	PRIMARY KEY(department_id)
 );
 
 INSERT INTO departments(department_name, over_head_costs, total_profit)
-VALUES ("Baby", 1000,0),
-("Pet", 3000,0),
-("Food", 5000,0),
-("Furniture", 7000,0);
+VALUES ("Baby", 0,0),
+("Pet", 0,0),
+("Food", 0,0),
+("Furniture", 0,0);
 
 SELECT * FROM departments;
 

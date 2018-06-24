@@ -6,6 +6,7 @@ var quantitySelected = 0;
 var totalProductPrice = 0;
 var totalPrice = 0;
 var moreShopping = true;
+
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -51,13 +52,14 @@ function viewProducts() {
     console.log('**************************\n');
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
-        console.log('Current Products Inventory\n');
+        console.log('Products currently available for purchasing:\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
             values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
         }
-        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available"];
         console.table(tableHeader, values);
+        console.log('**************************\n');
         askUser()
     });
 
@@ -111,9 +113,9 @@ function askUser() {
                         }
                     }
                 }]).then(function(answers) {
-                    console.log('quantitySelected -- ' + quantitySelected);
+                    //console.log('quantitySelected -- ' + quantitySelected);
                     quantitySelected = answers.quantity;
-                    console.log('quantitySelected --AFTER fixed-- ' + quantitySelected);
+                    //console.log('quantitySelected --AFTER fixed-- ' + quantitySelected);
                     askUserToBuyMore(idSelected,quantitySelected,res);
                 });
 
@@ -139,17 +141,13 @@ function askUserToBuyMore(userIdPar, userQuantityPar, data){
           message: "Do you want to purchase more items?",
       }]).then(function(answersMore) {
           if (answersMore.buyMore) { // if user wants to buy more products
-              // console.log('userIdPar-- ' + userIdPar);
-              // console.log('userQuantityPar-- ' + userQuantityPar);
-              // console.log('totalProductPrice-- ' + totalProductPrice);
               
               totalProductPrice = userQuantityPar * data[0].price;
               console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " : " + totalProductPrice);
               totalPrice = totalPrice + totalProductPrice;
                
-              updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, data); // update Database
+              updateDataProducts(userIdPar, userQuantityPar, totalPrice, data); // update Database
               
-            //   askUser();
           } else {// if user does not want to buy more products
 
               totalProductPrice = userQuantityPar * data[0].price;
@@ -165,12 +163,15 @@ function askUserToBuyMore(userIdPar, userQuantityPar, data){
       });
 }
 
+function addColumn(){
 
+
+}
 
 function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, data) {
 
     // create a new columnt to dislay product_sale data 
-    console.log('// update database information');
+    //console.log('// database updated');
 
     // ALTER TABLE departments ADD product_sales DECIMAL (10,2) DEFAULT 0;
 
@@ -184,44 +185,34 @@ function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, 
 //     });
 
 //   console.log('new column added');
-    
-
-   
-    console.log("userIdChoice + userQuantityChoice + data---   " + userIdChoice + userQuantityChoice + data);
 
     // update database information
         var updatedQuantity = data[0].quantity - userQuantityChoice;
+        //var soldProductPrice = totalPrice;
         var query = connection.query(
-          "UPDATE products SET ? WHERE ?",
-          [
-            {
-              quantity: updatedQuantity,
-              product_sales: soldProductPrice
-            },
-            {
-              id: userIdChoice
+            "UPDATE products SET ? WHERE ?",
+            [
+                {
+                quantity: updatedQuantity
+                },
+                {
+                id: userIdChoice
+                }
+            ],
+
+            function(err, res) {
+                if (err) throw err;
+                console.log(res.affectedRows + " REMOVE COMMENTS -products updated!\n");
+
+                if(moreShopping === true){
+                askUser();
+                }
+                else{ 
+                exit();
+
+                }
+            
             }
-          ],
-          function(err, res) {
-            console.log(res.affectedRows + " products updated!\n");
-
-
-
-            if(moreShopping === true){
-               askUser();
-            }
-            else{ 
-            exit();
-
-            }
-           
-
-
-
-            // console.log('Thank you for visiting BAMAZON store!');
-            // connection.end();
-           
-          }
         );
 
 };
