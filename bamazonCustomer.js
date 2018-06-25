@@ -6,7 +6,9 @@ var quantitySelected = 0;
 var totalProductPrice = 0;
 var totalPrice = 0;
 var moreShopping = true;
-
+var columnAdded = false;
+var divider = '**************************\n';
+var totalProfit = 0;
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -18,9 +20,41 @@ var connection = mysql.createConnection({
 // connects to the mysql server and sql database
 connection.connect(function(err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId);
+    // if(columnAdded == true){
+    // dropColumns();
+    // askUserToStart();
+    // }
+    addColumns();
     askUserToStart();
 });
+
+//check if this program was running before - to delete colums that were added  
+function addColumns(){ 
+        // create an additional column for product table 
+        
+        connection.query("ALTER TABLE products ADD COLUMN (product_sales DECIMAL (10,2) DEFAULT 0)", function(err, res) {
+            if (err) throw err;
+        });
+        // create an additional column for department table 
+        connection.query("ALTER TABLE departments ADD COLUMN (product_sales DECIMAL (10,2) DEFAULT 0)", function(err, res) {
+            if (err) throw err;
+        });
+        columnAdded = true;
+        //askUserToStart();
+};
+//check if this program was running before - to delete colums that were added  
+function dropColumns(){ 
+    // create an additional column for product table 
+    connection.query("ALTER TABLE products DROP COLUMN product_sales)", function(err, res) {
+        if (err) throw err;
+    });
+    // create an additional column for department table 
+    connection.query("ALTER TABLE departments DROP COLUMN product_sales)", function(err, res) {
+        if (err) throw err;
+    });
+    columnAdded = false;
+    //askUserToStart();
+};
 
 //starts the app and asks the user if they would like to view the store
 function askUserToStart() {
@@ -35,21 +69,21 @@ function askUserToStart() {
             viewProducts();
             //setTimeout(askUser, 1000);
         } else {
-          console.log('Thank you for visiting BAMAZON store!');
-          connection.end();
+            console.log(divider);
+            console.log('Thank you for visiting BAMAZON store!');
+            console.log(divider);
+            connection.end();
 
         }
     });
 }
 
-
-
 // function that makes a sql query to display all products to the user
 // in real life environemt we normall do not display the whole database, this is just for this app as an example
 function viewProducts() {
-    console.log('**************************\n');
+    console.log(divider);
     console.log("BAMAZON Store\n");
-    console.log('**************************\n');
+    console.log(divider);
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
         console.log('Products currently available for purchasing:\n');
@@ -59,34 +93,32 @@ function viewProducts() {
         }
         var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available"];
         console.table(tableHeader, values);
-        console.log('**************************\n');
+        console.log(divider);
         askUser()
     });
 
 };
 
 function askUser() {
-
     inquirer.prompt([{
         type: "input",
         name: "id",
-        message: "Please enter the ID number of the product you would like to buy.",
+        message: "Please enter the ID number of the product you would like to buy : ",
         // to validate a number entered
         validate: function(value) {
             if (isNaN(value) === false && parseInt(value) > 0 && parseInt(value) <= 10) {
                 return true;
             } else {
-                console.log('\nPlease enter a valid item ID (current inventory has only 10 products for sale).\n');
+                console.log('\nPlease enter a valid item ID (current inventory has only 10 products for sale) : \n');
             }
         }
-
     }, {
         type: "input",
         name: "quantity",
         message: "How many items you want to buy?",
         validate: function(value) {
             if (isNaN(value)) {
-                console.log('\nPlease enter a valid quantity number\n');
+                console.log('\nPlease enter a valid quantity number : \n');
             } else {
                 return true;
             }
@@ -96,129 +128,103 @@ function askUser() {
         quantitySelected = answers.quantity; // user choice
         connection.query("SELECT * FROM products WHERE id = " + idSelected, function(err, res) {
             if (err) throw err;
-
             if (quantitySelected > res[0].quantity) {
                 console.log('\nInsufficient Quantitiy. Currently in stock : ' + res[0].quantity + ' items ' + '\nPlease choose different amount of the selected product.');
                 // prompt user again to enter different amout of the selected product
-
                 inquirer.prompt([{
                     type: "input",
                     name: "quantity",
                     message: "How many items you want to buy?",
                     validate: function(value) {
                         if (isNaN(value)) {
-                            console.log('\nPlease enter a valid quantity number\n');
+                            console.log('\nPlease enter a valid quantity number :\n');
                         } else {
                             return true;
                         }
                     }
                 }]).then(function(answers) {
-                    //console.log('quantitySelected -- ' + quantitySelected);
                     quantitySelected = answers.quantity;
-                    //console.log('quantitySelected --AFTER fixed-- ' + quantitySelected);
-                    askUserToBuyMore(idSelected,quantitySelected,res);
+                    //check if user wants to buy more products
+                    askUserToBuyMore(idSelected, quantitySelected, res);
                 });
-
             } else {
                 // user prompt to ask if user wants to buy more or not
                 //if user wants to buy more, call askUser()
                 //if user does not want to buy more, call processOrder()
-
-                askUserToBuyMore(idSelected,quantitySelected,res);
-
+                askUserToBuyMore(idSelected, quantitySelected, res);
             }
-
         });
     });
-
 };
 
-function askUserToBuyMore(userIdPar, userQuantityPar, data){
-
-        inquirer.prompt([{
-          type: "confirm",
-          name: "buyMore",
-          message: "Do you want to purchase more items?",
-      }]).then(function(answersMore) {
-          if (answersMore.buyMore) { // if user wants to buy more products
-              
-              totalProductPrice = userQuantityPar * data[0].price;
-              console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " : " + totalProductPrice);
-              totalPrice = totalPrice + totalProductPrice;
-               
-              updateDataProducts(userIdPar, userQuantityPar, totalPrice, data); // update Database
-              
-          } else {// if user does not want to buy more products
-
-              totalProductPrice = userQuantityPar * data[0].price;
-              console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " is " + totalProductPrice);
-              totalPrice = totalPrice + totalProductPrice;
-
-              console.log("\nPlease review your order:  Total Order Price($): " + totalPrice + ".");
-              moreShopping = false;
-              updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, data);// update database, 
-
-
-          };
-      });
+function askUserToBuyMore(userIdPar, userQuantityPar, data) {
+    inquirer.prompt([{
+        type: "confirm",
+        name: "buyMore",
+        message: "Do you want to purchase more items?",
+    }]).then(function(answersMore) {
+        if (answersMore.buyMore) { // if user wants to buy more products
+            totalProductPrice = userQuantityPar * data[0].price;
+            console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " : " + totalProductPrice);
+            totalPrice = totalPrice + totalProductPrice;
+            var department = data[0].department;
+            updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, department, data); // update Database
+        } else { // if user does not want to buy more products
+            totalProductPrice = userQuantityPar * data[0].price;
+            console.log("\nYour Total Price($) for " + data[0].product + " " + data[0].price + " is " + totalProductPrice);
+            totalPrice = totalPrice + totalProductPrice;
+            console.log("\nPlease review your order:  Total Order Price($): " + totalPrice + ".");
+            console.log(divider);
+            moreShopping = false;
+            var department = data[0].department;
+            updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, department, data); // update database, 
+        };
+    });
 }
 
-function addColumn(){
+function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, productDepartment, data) {
+    
+    // enter product_sales price into a new column
+    var updatedQuantity = data[0].quantity - userQuantityChoice;
 
+    //update product_sales in the product table
+    connection.query("UPDATE products SET product_sales = product_sales + ? WHERE id = ?", [soldProductPrice, userIdChoice],
+        function(err, res) {
+            if (err) throw err;
+            // console.log(divider);
+            // console.log('Sales Price has been updated for ' + productDepartment + ' department!\n');
+            // console.log(divider);
+        });
 
-}
+    //update product_sales in the department table
+    connection.query("UPDATE departments SET product_sales = product_sales + ? WHERE department_name = ?", [soldProductPrice, productDepartment],
+        function(err, res) {
+            if (err) throw err;
+            // console.log(divider);
+            // console.log('Sales Price has been updated for ' + productDepartment + ' department!\n');
+            // console.log(divider);
+        });
 
-function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, data) {
-
-    // create a new columnt to dislay product_sale data 
-    //console.log('// database updated');
-
-    // ALTER TABLE departments ADD product_sales DECIMAL (10,2) DEFAULT 0;
-
-    // ALTER table login add column (code varchar(255));
-
-//     connection.query('ALTER TABLE products ADD productANDsales (code DECIMAL (10,2) DEFAULT 0)',function(err,result){
-//         if (err) throw err;
-
-//             console.log("new column added");
-        
-//     });
-
-//   console.log('new column added');
-
-    // update database information
-        var updatedQuantity = data[0].quantity - userQuantityChoice;
-        //var soldProductPrice = totalPrice;
-        var query = connection.query(
-            "UPDATE products SET ? WHERE ?",
-            [
-                {
-                quantity: updatedQuantity
-                },
-                {
-                id: userIdChoice
-                }
-            ],
-
-            function(err, res) {
-                if (err) throw err;
-                console.log(res.affectedRows + " REMOVE COMMENTS -products updated!\n");
-
-                if(moreShopping === true){
+    // update products table for quantity of the products
+    var query = connection.query(
+        "UPDATE products SET ? WHERE ?", [{
+            quantity: updatedQuantity
+        }, {
+            id: userIdChoice
+        }],
+        function(err, res) {
+            if (err) throw err;
+            //console.log(res.affectedRows + " REMOVE COMMENTS -products updated!\n");
+            if (moreShopping === true) {
                 askUser();
-                }
-                else{ 
+            } else {
                 exit();
-
-                }
-            
             }
-        );
-
+        }
+    );
 };
 
-function exit(){
-
-            console.log('Thank you for visiting BAMAZON store!');
-            connection.end();
+function exit() {
+    console.log('Thank you for visiting BAMAZON store!');
+    connection.end();
 }

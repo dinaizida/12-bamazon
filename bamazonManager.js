@@ -2,6 +2,8 @@ var mysql = require('mysql');
 var inquirer = require('inquirer');
 var table = require("console.table"); //to display inventory in a table format
 
+var divider = '**************************\n';
+
 var connection = mysql.createConnection({
     host: "localhost",
     port: 8889,
@@ -46,9 +48,9 @@ function start() {
 function viewProductForSale() {
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
-        console.log('**************************\n');
+        console.log(divider);
         console.log("BAMAZON Store Managers Portal\n");
-        console.log('**************************\n');
+        console.log(divider);
         console.log('Current Products Inventory\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
@@ -56,15 +58,15 @@ function viewProductForSale() {
         }
         var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
         console.table(tableHeader, values);
-        console.log('**************************\n');
+        console.log(divider);
         start();
     });
 };
 
 function ViewLowInventory() {
-    console.log('**************************\n');
-    console.log('The following products have low inventory: \n');
-    connection.query("SELECT * FROM products WHERE quantity < 10", function(err, res) {
+    console.log(divider);
+    console.log('The following products have low inventory : \n');
+    connection.query("SELECT * FROM products WHERE quantity < 5", function(err, res) {
         if (err) throw err;
         var values = [];
         for (var i = 0; i < res.length; i++) {
@@ -72,7 +74,7 @@ function ViewLowInventory() {
         }
         var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
         console.table(tableHeader, values);
-        console.log('**************************\n');
+        console.log(divider);
         start();
     });
 };
@@ -81,7 +83,7 @@ function AddToInventory() {
     inquirer.prompt([{
         type: "input",
         name: "id",
-        message: "Please enter the ID number of the product you would like to update."
+        message: "Please enter the ID number of the product you would like to update : "
     }, {
         type: "input",
         name: "quantity",
@@ -97,9 +99,9 @@ function AddToInventory() {
                 connection.query("SELECT * FROM products WHERE id = ?", [idSelected],
                     function(err, res) {
                         if (err) throw err;
-                        console.log('**************************\n');
+                        console.log(divider);
                         console.log('Inventory has been updated for ' + res[0].product + '!\n');
-                        console.log('**************************\n');
+                        console.log(divider);
                         start();
                     });
             });
@@ -111,19 +113,19 @@ function AddNewProduct() {
     inquirer.prompt([{
         name: "name",
         type: "input",
-        message: "Please enter the product name:"
+        message: "Please enter the product name : "
     }, {
         name: "dept",
         type: "input",
-        message: "Please enter the department name:"
+        message: "Please enter the department name : "
     }, {
         name: "price",
         type: "input",
-        message: "Please enter the product's price:"
+        message: "Please enter the product's price : "
     }, {
         name: "quantity",
         type: "input",
-        message: "Please enter the quantity of the product:"
+        message: "Please enter the quantity of the product : "
     }]).then(function(answer) {
         connection.query("INSERT INTO products SET ?", {
                 product: answer.name,
@@ -134,9 +136,9 @@ function AddNewProduct() {
             function(err, res) {
                 if (err) throw err;
 
-                console.log('**************************\n');
+                console.log(divider);
                 console.log(answer.name + ' was successfully added to the inventory!\n');
-                console.log('**************************\n');
+                console.log(divider);
                 start();
             });
     });
@@ -144,6 +146,6 @@ function AddNewProduct() {
 
 function exit() {
     console.log('Thank you for Managing BAMAZON store!\n');
-    console.log('**************************\n');
+    console.log(divider);
     connection.end();
 };
