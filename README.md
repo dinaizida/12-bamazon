@@ -22,29 +22,34 @@ bamazonManager.js
      * View Low Inventory
      * Add to Inventory
      * Add New Product
-     * End Session
+     * Exit
  - If the manager selects View Products for Sale, it lists all of the products in the store including all of their details.
  - If the manager selects View Low Inventory, it'll list all the products with less than five items in its StockQuantity column.
  - If the manager selects Add to Inventory, it allows the manager to select a product and add inventory.
  - If the manager selects Add New Product, it allows the manager to add a new product to the store.
- - If the manager selects End Session, it ends the session and doesn't go back to the menu.     
+ - If the manager selects Exit, it ends the session and doesn't go back to the menu.     
 
 bamazonSupervisor.js
-
-Starts with a menu:
-
-View Product Sales by Department
-Create New Department
-End Session
-If the manager selects View Product Sales by Department, it lists the Department Sales and calculates the total sales from the overhead cost and product sales.
-
-If the manager selects Create New Department, it allows the manager to create a new department and input current overhead costs and product sales. If there are none, by default it will set at 0.
-
-If the manager selects End Session, it ends the session and doesn't go back to the menu.
+ - Starts with a menu:
+     * View Product Sales by Department
+     * Create New Department
+     * Exit
+  - If the Supervisor selects View Product Sales by Department, it lists the Department - Sales and calculates the total sales from the overhead cost and product sales.
+  - If the Supervisor selects Create New Department, it allows the manager to create a  new department and input current overhead costs and product sales. If there are none, by default it will set at 0.
+  - If the Supervisor selects Exit, it ends the session and doesn't go back to the menu.
 
 ### Technologies Used: 
 
 NODE.js, MySQL NPM package, Inquire NPM package. 
 
+bamazonCustomer.js
 
-![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/>>>>>.png)
+![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/customer.gif)
+
+bamazonManager.js
+
+![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/manager.gif)
+
+bamazonSupervisor.js
+
+![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/supervisor.gif)
