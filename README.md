@@ -44,12 +44,12 @@ NODE.js, MySQL NPM package, Inquire NPM package.
 
 bamazonCustomer.js
 
-![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/customer.gif)
+![Screen Shot](https://github.com/dinaizida/blob/master/assets/images/customer.gif)
 
 bamazonManager.js
 
-![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/manager.gif)
+![Screen Shot](https://github.com/dinaizida/blob/master/assets/images/manager.gif)
 
 bamazonSupervisor.js
 
-![Screen Shot](https://github.com/dinaizida/>>>>>>>./blob/master/assets/images/supervisor.gif)
+![Screen Shot](https://github.com/dinaizida/blob/master/assets/images/supervisor.gif)
