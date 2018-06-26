@@ -6,7 +6,6 @@ var quantitySelected = 0;
 var totalProductPrice = 0;
 var totalPrice = 0;
 var moreShopping = true;
-var columnAdded = false;
 var divider = '**************************\n';
 var totalProfit = 0;
 var connection = mysql.createConnection({
@@ -24,37 +23,9 @@ connection.connect(function(err) {
     // dropColumns();
     // askUserToStart();
     // }
-    addColumns();
+    
     askUserToStart();
 });
-
-//check if this program was running before - to delete colums that were added  
-function addColumns(){ 
-        // create an additional column for product table 
-        
-        connection.query("ALTER TABLE products ADD COLUMN (product_sales DECIMAL (10,2) DEFAULT 0)", function(err, res) {
-            if (err) throw err;
-        });
-        // create an additional column for department table 
-        connection.query("ALTER TABLE departments ADD COLUMN (product_sales DECIMAL (10,2) DEFAULT 0)", function(err, res) {
-            if (err) throw err;
-        });
-        columnAdded = true;
-        //askUserToStart();
-};
-//check if this program was running before - to delete colums that were added  
-function dropColumns(){ 
-    // create an additional column for product table 
-    connection.query("ALTER TABLE products DROP COLUMN product_sales)", function(err, res) {
-        if (err) throw err;
-    });
-    // create an additional column for department table 
-    connection.query("ALTER TABLE departments DROP COLUMN product_sales)", function(err, res) {
-        if (err) throw err;
-    });
-    columnAdded = false;
-    //askUserToStart();
-};
 
 //starts the app and asks the user if they would like to view the store
 function askUserToStart() {
@@ -76,8 +47,7 @@ function askUserToStart() {
 
         }
     });
-}
-
+};
 // function that makes a sql query to display all products to the user
 // in real life environemt we normall do not display the whole database, this is just for this app as an example
 function viewProducts() {
@@ -89,16 +59,14 @@ function viewProducts() {
         console.log('Products currently available for purchasing:\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
-            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity], res[i].product_sales);
         }
-        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available"];
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available", "Product Sales"];
         console.table(tableHeader, values);
         console.log(divider);
         askUser()
     });
-
 };
-
 function askUser() {
     inquirer.prompt([{
         type: "input",
@@ -156,7 +124,6 @@ function askUser() {
         });
     });
 };
-
 function askUserToBuyMore(userIdPar, userQuantityPar, data) {
     inquirer.prompt([{
         type: "confirm",
@@ -180,8 +147,7 @@ function askUserToBuyMore(userIdPar, userQuantityPar, data) {
             updateDataProducts(userIdPar, userQuantityPar, totalProductPrice, department, data); // update database, 
         };
     });
-}
-
+};
 function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, productDepartment, data) {
     
     // enter product_sales price into a new column
@@ -223,8 +189,7 @@ function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, 
         }
     );
 };
-
 function exit() {
     console.log('Thank you for visiting BAMAZON store!');
     connection.end();
-}
+};
