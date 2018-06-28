@@ -18,12 +18,7 @@ var connection = mysql.createConnection({
 
 // connects to the mysql server and sql database
 connection.connect(function(err) {
-    if (err) throw err;
-    // if(columnAdded == true){
-    // dropColumns();
-    // askUserToStart();
-    // }
-    
+    if (err) throw err
     askUserToStart();
 });
 
@@ -34,17 +29,11 @@ function askUserToStart() {
         type: "confirm",
         name: "wantToView",
         message: "Would you like to view the available products?",
-
     }]).then(function(answers) {
         if (answers.wantToView) {
             viewProducts();
-            //setTimeout(askUser, 1000);
         } else {
-            console.log(divider);
-            console.log('Thank you for visiting BAMAZON store!');
-            console.log(divider);
-            connection.end();
-
+            exit();
         }
     });
 };
@@ -59,12 +48,12 @@ function viewProducts() {
         console.log('Products currently available for purchasing:\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
-            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity], res[i].product_sales);
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity, res[i].product_sales]);
         }
         var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available", "Product Sales"];
         console.table(tableHeader, values);
         console.log(divider);
-        askUser()
+        askUser();
     });
 };
 function askUser() {
@@ -190,6 +179,8 @@ function updateDataProducts(userIdChoice, userQuantityChoice, soldProductPrice, 
     );
 };
 function exit() {
+    console.log(divider);
     console.log('Thank you for visiting BAMAZON store!');
+    console.log(divider);
     connection.end();
 };

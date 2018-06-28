@@ -45,6 +45,12 @@ function start() {
     });
 };
 
+
+// for (var i = 0; i < res.length; i++) {
+//     values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity, res[i].product_sales]);
+// }
+// var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available", "Product Sales"];   
+
 function viewProductForSale() {
     connection.query("SELECT * FROM products", function(err, res) {
         if (err) throw err;
@@ -54,9 +60,9 @@ function viewProductForSale() {
         console.log('Current Products Inventory\n');
         var values = [];
         for (var i = 0; i < res.length; i++) {
-            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity, res[i].product_sales]);
         }
-        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available", "Product Sales"];
         console.table(tableHeader, values);
         console.log(divider);
         start();
@@ -70,9 +76,9 @@ function ViewLowInventory() {
         if (err) throw err;
         var values = [];
         for (var i = 0; i < res.length; i++) {
-            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity]);
+            values.push([res[i].id, res[i].product, res[i].department, res[i].price, res[i].quantity, res[i].product_sales]);
         }
-        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity"];
+        var tableHeader = ["ID", "Product", "Department", "Price ($)", "Quantity Available", "Product Sales"];
         console.table(tableHeader, values);
         console.log(divider);
         start();
